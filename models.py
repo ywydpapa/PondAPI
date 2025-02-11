@@ -8,7 +8,10 @@ class User(Base):
     __table__ = metadata.tables["traceUser"]
 
 class Setups(Base):
-    __table__ = metadata.tables["tradingSetup"]
+    __table__ = metadata.tables["traceSetup"]
+
+class Sets(Base):
+    __table__ = metadata.tables["traceSets"]
 
 class Result(Base):
     __table__ = metadata.tables["tradeResult"]

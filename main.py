@@ -1,9 +1,9 @@
 from fastapi import FastAPI, Depends, Query
 from sqlalchemy.orm import Session
 from database import SessionLocal, engine
-from models import User, Setups, Result
+from models import User, Setups, Result, Sets
 from typing import List, Optional
-from schemas import UserResponse, SetupResponse, ResultResponse
+from schemas import UserResponse, SetupResponse, ResultResponse, UserkeyResponse, SetsResponse
 
 app = FastAPI()
 
@@ -21,14 +21,24 @@ def read_users(db: Session = Depends(get_db)):
     users = db.query(User).all()
     return users
 
+@app.get("/userkey/{userNo}", response_model=List[UserkeyResponse])
+def read_users(userNo: int, db: Session = Depends(get_db)):
+    userkey = db.query(User).filter(User.userNo == userNo).all()
+    return userkey
+
 @app.get("/setup", response_model=List[SetupResponse])
 def read_setups(db: Session = Depends(get_db)):
-    setups = db.query(Setups).filter(Setups.attrib.ilike(f"%XXXUP%")).all()
+    setups = db.query(Setups).filter(Setups.attrib.not_like(f"%XXXUP%")).all()
     return setups
+
+@app.get("/sets/{setNo}", response_model=List[SetsResponse])
+def read_sets(setNo : int, db: Session = Depends(get_db)):
+    sets = db.query(Sets).filter(Sets.setNo == setNo).all()
+    return sets
 
 @app.get("/setup/{userNo}", response_model=List[SetupResponse])
 def user_setups(userNo: int, db: Session = Depends(get_db)):
-    setups = db.query(Setups).filter(Setups.attrib.like(f"%10000%"), Setups.userNo == userNo ).all()
+    setups = db.query(Setups).filter(Setups.attrib.not_like(f"%XXXUP%"), Setups.userNo == userNo ).all()
     return setups
 
 @app.get("/myresult/{userNo}", response_model=List[ResultResponse])
