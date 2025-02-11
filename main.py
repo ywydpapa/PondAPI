@@ -1,20 +1,11 @@
 from fastapi import FastAPI, Depends, Query
 from sqlalchemy.orm import Session
 from database import SessionLocal, engine
-from models import User
+from models import User, Setups, Result
 from typing import List, Optional
-from pydantic import BaseModel
+from schemas import UserResponse, SetupResponse, ResultResponse
 
 app = FastAPI()
-
-# Pydantic 스키마 정의
-class UserResponse(BaseModel):
-    userNo: int
-    userId: str
-    userName: str
-
-    class Config:
-        orm_mode = True
 
 # 데이터베이스 세션 의존성
 def get_db():
@@ -29,6 +20,22 @@ def get_db():
 def read_users(db: Session = Depends(get_db)):
     users = db.query(User).all()
     return users
+
+@app.get("/setup", response_model=List[SetupResponse])
+def read_setups(db: Session = Depends(get_db)):
+    setups = db.query(Setups).filter(Setups.attrib.ilike(f"%XXXUP%")).all()
+    return setups
+
+@app.get("/setup/{userNo}", response_model=List[SetupResponse])
+def user_setups(userNo: int, db: Session = Depends(get_db)):
+    setups = db.query(Setups).filter(Setups.attrib.like(f"%10000%"), Setups.userNo == userNo ).all()
+    return setups
+
+@app.get("/myresult/{userNo}", response_model=List[ResultResponse])
+def myresults(userNo: int , db: Session = Depends(get_db)):
+    setups = db.query(Result).filter(Result.userNo == userNo).all()
+    return setups
+
 
 # 특정 사용자 조회 (조건: ID)
 @app.get("/users/{userNo}", response_model=UserResponse)
