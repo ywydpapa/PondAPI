@@ -15,3 +15,18 @@ class Sets(Base):
 
 class Result(Base):
     __table__ = metadata.tables["tradeResult"]
+
+class Board(Base):
+    __table__ = metadata.tables["board"]
+
+class Errors(Base):
+    __table__ = metadata.tables["error_Log"]
+
+class Service(Base):
+    __table__ = metadata.tables["service_Log"]
+
+class Server(Base):
+    __table__ = metadata.tables["serverSet"]
+
+class ServiceStat(Base):
+    __table__ = metadata.tables["service_Stat"]
