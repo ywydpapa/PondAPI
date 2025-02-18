@@ -30,3 +30,6 @@ class Server(Base):
 
 class ServiceStat(Base):
     __table__ = metadata.tables["service_Stat"]
+
+class Losscut(Base):
+    __table__ = metadata.tables["lcLog"]

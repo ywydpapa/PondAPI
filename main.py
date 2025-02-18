@@ -1,9 +1,9 @@
 from fastapi import FastAPI, Depends, Query
 from sqlalchemy.orm import Session
 from database import SessionLocal, engine
-from models import User, Setups, Result, Sets
+from models import User, Setups, Result, Sets, Losscut
 from typing import List, Optional
-from schemas import UserResponse, SetupResponse, ResultResponse, UserkeyResponse, SetsResponse
+from schemas import UserResponse, SetupResponse, ResultResponse, UserkeyResponse, SetsResponse, LosscutResponse
 
 app = FastAPI()
 
@@ -45,6 +45,12 @@ def user_setups(userNo: int, db: Session = Depends(get_db)):
 def myresults(userNo: int , db: Session = Depends(get_db)):
     setups = db.query(Result).filter(Result.userNo == userNo).all()
     return setups
+
+
+@app.get("/losscuts/{userNo}", response_model=List[LosscutResponse])
+def losscuts(userNo: int, db: Session = Depends(get_db)):
+    items = db.query(Losscut).filter(Losscut.userNo == userNo).all()
+    return items
 
 
 # 특정 사용자 조회 (조건: ID)
