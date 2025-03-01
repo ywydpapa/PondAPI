@@ -61,9 +61,10 @@ def calculate_rsi(df, period=14):
     return df
 
 
-def plot_candlestick_with_cross(df, short_window, long_window):
+def plot_candlestick_with_cross(df, short_window, middle_window,long_window, coinn):
     # 이동평균선 계산
     df['short_MA'] = df['close'].rolling(window=short_window).mean()
+    df['middle_MA'] = df['close'].rolling(window=middle_window).mean()
     df['long_MA'] = df['close'].rolling(window=long_window).mean()
 
     # 이동평균선 교차 지점 찾기
@@ -74,17 +75,27 @@ def plot_candlestick_with_cross(df, short_window, long_window):
     df['golden_cross'] = np.where(df['cross'] == 1, df['close'], np.nan)
     df['dead_cross'] = np.where(df['cross'] == -1, df['close'], np.nan)
 
+    mc = mpf.make_marketcolors(
+        up='red',  # 상승 캔들 색상
+        down='blue',  # 하락 캔들 색상
+        edge='inherit',
+        wick='inherit',
+        volume='inherit'
+    )
+
+    sty = mpf.make_mpf_style(marketcolors=mc)
+
     # 📈 캔들차트 그리기
     apds = [
         mpf.make_addplot(df['short_MA'], color='blue', width=1.5, label='Short MA'),
+        mpf.make_addplot(df['middle_MA'], color='green', width=1.5, label='Middle MA'),
         mpf.make_addplot(df['long_MA'], color='red', width=1.5, label='Long MA'),
         mpf.make_addplot(df['golden_cross'], scatter=True, marker='^', color='green', markersize=100,
                          label='Golden Cross'),
-        mpf.make_addplot(df['dead_cross'], scatter=True, marker='v', color='red', markersize=100, label='Dead Cross'),
-     #   mpf.make_addplot(df['RSI'], panel=1, color='purple', ylabel="RSI (14)"),
+        mpf.make_addplot(df['dead_cross'], scatter=True, marker='v', color='orange', markersize=100, label='Dead Cross'),
     ]
-
-    mpf.plot(df, type='candle', style='charles', title="Candlestick Chart (MA Cross)",
+    titleset = f"{coinn} Candlestick Chart (MA Cross)"
+    mpf.plot(df, type='candle', style=sty, title=titleset,
              ylabel="Price (KRW)", volume=True, addplot=apds, panel_ratios=(6, 2))
 
     return df[df['cross'] == 1], df[df['cross'] == -1]  # 골든/데드 크로스 값 반환
@@ -92,8 +103,8 @@ def plot_candlestick_with_cross(df, short_window, long_window):
 def getchart(coinn, unit, count):
     df = get_upbit_candles(coinn, "minutes", unit, count)
     df = df[::-1]
-    golden_cross, dead_cross = plot_candlestick_with_cross(df, 5, 20)
+    golden_cross, dead_cross = plot_candlestick_with_cross(df, 3, 15, 30, coinn)
     print("🔹 골든크로스:\n", golden_cross[['close']])
     print("🔹 데드크로스:\n", dead_cross[['close']])
 
-getchart("KRW-XRP", 1, 60)
+getchart("KRW-DOGE", 1, 180)
