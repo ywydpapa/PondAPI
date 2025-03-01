@@ -50,7 +50,6 @@ def calculate_rsi(df, period=14):
         df['RSI'] = np.nan
         return df
 
-    # ✅ NaN 방지: 이동 평균을 계산할 때 최소 기간 지정
     avg_gain = pd.Series(gain).ewm(span=period, min_periods=1, adjust=False).mean()
     avg_loss = pd.Series(loss).ewm(span=period, min_periods=1, adjust=False).mean()
     avg_loss = avg_loss.replace(0, 1e-10)
@@ -67,8 +66,6 @@ def plot_candlestick_with_cross(df, short_window, long_window):
     df['short_MA'] = df['close'].rolling(window=short_window).mean()
     df['long_MA'] = df['close'].rolling(window=long_window).mean()
 
-    df = calculate_rsi(df, 14)
-
     # 이동평균선 교차 지점 찾기
     df['signal'] = np.where(df['short_MA'] > df['long_MA'], 1, 0)
     df['cross'] = df['signal'].diff()
@@ -84,20 +81,19 @@ def plot_candlestick_with_cross(df, short_window, long_window):
         mpf.make_addplot(df['golden_cross'], scatter=True, marker='^', color='green', markersize=100,
                          label='Golden Cross'),
         mpf.make_addplot(df['dead_cross'], scatter=True, marker='v', color='red', markersize=100, label='Dead Cross'),
-        mpf.make_addplot(df['RSI'], panel=1, color='purple', ylabel="RSI (14)"),
+     #   mpf.make_addplot(df['RSI'], panel=1, color='purple', ylabel="RSI (14)"),
     ]
 
-    mpf.plot(df, type='candle', style='charles', title="ETH/KRW Candlestick Chart (MA Cross)",
+    mpf.plot(df, type='candle', style='charles', title="Candlestick Chart (MA Cross)",
              ylabel="Price (KRW)", volume=True, addplot=apds, panel_ratios=(6, 2))
 
     return df[df['cross'] == 1], df[df['cross'] == -1]  # 골든/데드 크로스 값 반환
 
+def getchart(coinn, unit, count):
+    df = get_upbit_candles(coinn, "minutes", unit, count)
+    df = df[::-1]
+    golden_cross, dead_cross = plot_candlestick_with_cross(df, 5, 20)
+    print("🔹 골든크로스:\n", golden_cross[['close']])
+    print("🔹 데드크로스:\n", dead_cross[['close']])
 
-df = get_upbit_candles("KRW-ETH", "minutes",5, 100)
-print(df.columns)  # 데이터프레임의 컬럼 확인
-print(df.head())  # 데이터 내용 확인
-df = df[::-1]
-golden_cross, dead_cross = plot_candlestick_with_cross(df,5,20)
-
-print("🔹 골든크로스:\n", golden_cross[['close']])
-print("🔹 데드크로스:\n", dead_cross[['close']])
+getchart("KRW-XRP", 1, 60)
