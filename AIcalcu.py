@@ -34,30 +34,17 @@ def plot_candlestick_chart(df):
         mav=(5, 10),  # 이동평균선 (5, 10)
     )
 
-
-def calculate_rsi(df, period=14):
-    if df.empty or 'close' not in df:
-        print("⚠️ Warning: 데이터가 없습니다. RSI 계산을 건너뜁니다.")
-        df['RSI'] = np.nan
-        return df
-    delta = df['close'].diff()
-    # 🔹 상승분과 하락분 계산 (음수 방지)
-    gain = np.where(delta > 0, delta, 0)
-    loss = np.where(delta < 0, -delta, 0)
-
-    if len(gain) == 0 or len(loss) == 0:
-        print("❌ Error: gain 또는 loss가 비어 있습니다.")
-        df['RSI'] = np.nan
-        return df
-
-    avg_gain = pd.Series(gain).ewm(span=period, min_periods=1, adjust=False).mean()
-    avg_loss = pd.Series(loss).ewm(span=period, min_periods=1, adjust=False).mean()
-    avg_loss = avg_loss.replace(0, 1e-10)
-    rs = avg_gain / avg_loss
+def compute_rsi(data, period=14):
+    delta = data.diff(1)  # 가격 변동 계산
+    gain = (delta.where(delta > 0, 0)).rolling(window=period).mean()
+    loss = (-delta.where(delta < 0, 0)).rolling(window=period).mean()
+    rs = gain / loss
     rsi = 100 - (100 / (1 + rs))
-    rsi.name = 'RSI'
-    rsif = rsi.to_frame()
-    df = df.merge(rsif, left_index=True, right_index=True, how='left')
+    return rsi
+
+    df['rsi'] = compute_rsi(df['close'])
+    df.dropna(inplace=True)  # NaN 값 제거
+    df = df[['close', 'rsi']]
     return df
 
 
@@ -107,4 +94,4 @@ def getchart(coinn, unit, count):
     print("🔹 골든크로스:\n", golden_cross[['close']])
     print("🔹 데드크로스:\n", dead_cross[['close']])
 
-getchart("KRW-DOGE", 1, 180)
+getchart("KRW-XRP", 1, 120)
