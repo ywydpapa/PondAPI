@@ -19,7 +19,7 @@ def get_candles(market, hours):
     df = df[['candle_date_time_kst', 'opening_price', 'high_price', 'low_price', 'trade_price']]
     return df
 
-df = get_candles("KRW-ADA",72)
+df = get_candles("KRW-BTC",72)
 # 방향 계산
 df['change_signal'] = df['trade_price'] - df['opening_price']
 
@@ -36,5 +36,5 @@ df["change_symbol"] = df["change_signal"].apply(lambda x: "+" if x > 0 else "-" 
 symbol_cnt = df["change_symbol"].value_counts().reindex(["+","-","0"], fill_value=0)
 
 # 출력
-print(df[['candle_date_time_kst', 'change_range', 'change_rate', 'change_symbol']])
+print(df[['candle_date_time_kst', 'trade_price', 'change_range', 'change_rate', 'change_symbol']])
 print(symbol_cnt)
