@@ -19,23 +19,22 @@ def get_candles(market, hours):
     df = df[['candle_date_time_kst', 'opening_price', 'high_price', 'low_price', 'trade_price']]
     return df
 
-df = get_candles("KRW-ETH",24)
+df = get_candles("KRW-ADA",72)
+# 방향 계산
+df['change_signal'] = df['trade_price'] - df['opening_price']
+
 # 변화폭 계산 (고가 - 저가)
-df['change_range'] = df['high_price'] - df['low_price']
-
-# 변화폭 계산 (시가 - 고가)
-df['change_rangeoh'] = df['opening_price'] - df['high_price']
-
-# 변화폭 계산 (시가 - 저가)
-df['change_rangeol'] = df['opening_price'] - df['low_price']
-
-# 변화폭 계산 (종가 - 고가)
-df['change_rangeth'] = df['trade_price'] - df['high_price']
-
-# 변화폭 계산 (종가 - 저가)
-df['change_rangetl'] = df['trade_price'] - df['low_price']
+df['change_range'] = (df['high_price'] - df['low_price'])
 
 #변화율 계산
-df['change_rate'] = (df['high_price'] - df['low_price']) / df['low_price'] * 100
+df['change_rate'] = (df['trade_price'] - df['opening_price']) / df['trade_price'] * 100
+
+#방향 계산
+df["change_symbol"] = df["change_signal"].apply(lambda x: "+" if x > 0 else "-" if x < 0 else "0")
+
+#방향수 계산
+symbol_cnt = df["change_symbol"].value_counts().reindex(["+","-","0"], fill_value=0)
+
 # 출력
-print(df[['candle_date_time_kst', 'change_range', 'change_rate']])
+print(df[['candle_date_time_kst', 'change_range', 'change_rate', 'change_symbol']])
+print(symbol_cnt)
