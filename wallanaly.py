@@ -70,15 +70,15 @@ strength_by_time, bid_walls, ask_walls, max_bid_wall, max_ask_wall, bid_to_ask_r
 
 print("📊 분별 체결강도:")
 print(strength_by_time)
-print(f"\n💎 가장 큰 매수벽 (Bid Wall): {max_bid_wall['price']} 원 / {max_bid_wall['quantity']} / {round(max_bid_wall['price']*max_bid_wall['quantity'],2)} {market}")
-print(f"🔥 가장 큰 매도벽 (Ask Wall): {max_ask_wall['price']} 원 / {max_ask_wall['quantity']} / {round(max_ask_wall['price']*max_ask_wall['quantity'],2)} {market}")
+print(f"\n💎 가장 큰 매수벽 (Bid Wall): {max_bid_wall['price']} 원 / {max_bid_wall['quantity']} / {round(max_bid_wall['price']*max_bid_wall['quantity'],2):,.2f} 원 {market}")
+print(f"🔥 가장 큰 매도벽 (Ask Wall): {max_ask_wall['price']} 원 / {max_ask_wall['quantity']} / {round(max_ask_wall['price']*max_ask_wall['quantity'],2):,.2f} 원 {market}")
 print(f"\n📉 매수벽과 매도벽 비율 (Bid:Ask): {bid_to_ask_ratio:.2f}")
 
 # 📑 가격대별 매수벽과 매도벽 출력
 print("\n📈 매수벽 상세 (가격대별):")
 for bid in bid_walls:
-    print(f"가격: {bid['price']} 원 / 매수량: {bid['quantity']} {market}")
+    print(f"가격: {bid['price']:,.1f} 원 / 매수량: {bid['quantity']} {market}")
 
 print("\n📉 매도벽 상세 (가격대별):")
 for ask in ask_walls:
-    print(f"가격: {ask['price']} 원 / 매도량: {ask['quantity']} {market}")
+    print(f"가격: {ask['price']:,.1f} 원 / 매도량: {ask['quantity']} {market}")
