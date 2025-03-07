@@ -15,6 +15,7 @@ def get_candles(market, hours):
     data = response.json()
     # 데이터프레임 변환
     df = pd.DataFrame(data)
+    df = df[::-1].reset_index(drop=True)
     # 필요한 컬럼 선택
     df = df[['candle_date_time_kst', 'opening_price', 'high_price', 'low_price', 'trade_price']]
     return df
